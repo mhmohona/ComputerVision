@@ -60,7 +60,7 @@ def generate_yaml(
     not_found = [
         lib
         for lib in needed_libraries
-        if not any(lib in ext for ext in extracted_libraries)
+        if all(lib not in ext for ext in extracted_libraries)
     ]
 
     # Create the deployment-specific yaml file

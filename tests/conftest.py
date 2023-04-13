@@ -49,8 +49,7 @@ def path_similarity_notebooks():
 def classification_notebooks():
     folder_notebooks = path_classification_notebooks()
 
-    # Path for the notebooks
-    paths = {
+    return {
         "00_webcam": os.path.join(folder_notebooks, "00_webcam.ipynb"),
         "01_training_introduction": os.path.join(
             folder_notebooks, "01_training_introduction.ipynb"
@@ -87,15 +86,13 @@ def classification_notebooks():
             folder_notebooks, "24_exploring_hyperparameters_on_azureml.ipynb"
         ),
     }
-    return paths
 
 
 @pytest.fixture(scope="module")
 def similarity_notebooks():
     folder_notebooks = path_similarity_notebooks()
 
-    # Path for the notebooks
-    paths = {
+    return {
         "00": os.path.join(folder_notebooks, "00_webcam.ipynb"),
         "01": os.path.join(
             folder_notebooks, "01_training_and_evaluation_introduction.ipynb"
@@ -105,7 +102,6 @@ def similarity_notebooks():
         ),
         "12": os.path.join(folder_notebooks, "12_fast_retrieval.ipynb"),
     }
-    return paths
 
 
 # ----- Function fixtures ----------------------------------------------------------
@@ -224,7 +220,7 @@ def testing_im_list(tmp_session):
     can_im_paths = os.listdir(os.path.join(im_paths, "can"))
     can_im_paths = [
         os.path.join(im_paths, "can", im_name) for im_name in can_im_paths
-    ][0:5]
+    ][:5]
     return can_im_paths
 
 
@@ -239,7 +235,7 @@ def testing_databunch(tmp_session):
     can_im_paths = os.listdir(os.path.join(im_paths, "can"))
     can_im_paths = [
         os.path.join(im_paths, "can", im_name) for im_name in can_im_paths
-    ][0:5]
+    ][:5]
     random.seed(642)
     data = (
         ImageList.from_folder(im_paths)
@@ -250,9 +246,7 @@ def testing_databunch(tmp_session):
         .normalize(imagenet_stats)
     )
 
-    validation_bunch = data.valid_ds
-
-    return validation_bunch
+    return data.valid_ds
 
 
 def pytest_addoption(parser):

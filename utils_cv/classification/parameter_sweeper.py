@@ -227,9 +227,8 @@ class ParameterSweeper:
     @property
     def permutations(self) -> List[Tuple[Any]]:
         """ Returns a list of all permutations, expressed in tuples. """
-        params = tuple([self.params[k] for k in self.param_order])
-        permutations = list(itertools.product(*params))
-        return permutations
+        params = tuple(self.params[k] for k in self.param_order)
+        return list(itertools.product(*params))
 
     @staticmethod
     def _get_data_bunch(
@@ -292,7 +291,7 @@ class ParameterSweeper:
         return pd.DataFrame.from_dict(
             {
                 (i, j, k): results[i][j][k]
-                for i in results.keys()
+                for i in results
                 for j in results[i].keys()
                 for k in results[i][j].keys()
             },
@@ -353,7 +352,7 @@ class ParameterSweeper:
 
         data = self._get_data_bunch(data_path, transform, im_size, batch_size)
 
-        callbacks = list()
+        callbacks = []
         if stop_early:
             callbacks.append(ParameterSweeper._early_stopping_callback())
 
@@ -444,9 +443,9 @@ class ParameterSweeper:
             pd.DataFrame: a multi-index dataframe with the results stored in it.
         """
 
-        res = dict()
+        res = {}
         for rep in range(reps):
-            res[rep] = dict()
+            res[rep] = {}
 
             for i, permutation in enumerate(self.permutations):
                 print(
@@ -457,12 +456,12 @@ class ParameterSweeper:
                 stringified_permutation = self._serialize_permutations(
                     permutation
                 )
-                res[rep][stringified_permutation] = dict()
+                res[rep][stringified_permutation] = {}
                 for dataset in datasets:
 
                     data_name = os.path.basename(dataset)
 
-                    res[rep][stringified_permutation][data_name] = dict()
+                    res[rep][stringified_permutation][data_name] = {}
 
                     learn, duration = self._learn(
                         dataset, permutation, early_stopping

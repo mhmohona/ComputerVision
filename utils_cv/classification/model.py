@@ -238,16 +238,16 @@ class TrainMetricsRecorder(LearnerCallback):
         # Add metrics names
         self.metrics_names = [m_fn.__name__ for m_fn in metrics]
         for m in self.metrics_names:
-            self.names.append("train_" + m)
+            self.names.append(f"train_{m}")
             if self.has_val:
-                self.names.append("valid_" + m)
+                self.names.append(f"valid_{m}")
         self.names.append("time")
         self.pbar.write(self.names, table=True)
 
         self.n_epochs = n_epochs
         self.valid_metrics = []
         self.train_metrics = []
-        
+
         # Reset graph
         self._fig = None
         self._axes = None
@@ -315,15 +315,14 @@ class TrainMetricsRecorder(LearnerCallback):
 
     def _format_stats(self, stats: TensorOrNumList) -> None:
         """Format stats before printing. Note, this does the same thing as Recorder's"""
-        str_stats = []
-        for name, stat in zip(self.names, stats):
-            str_stats.append(
-                "#na#"
-                if stat is None
-                else str(stat)
-                if isinstance(stat, int)
-                else f"{stat:.6f}"
-            )
+        str_stats = [
+            "#na#"
+            if stat is None
+            else str(stat)
+            if isinstance(stat, int)
+            else f"{stat:.6f}"
+            for name, stat in zip(self.names, stats)
+        ]
         str_stats.append(format_time(time() - self.start_epoch))
         self.pbar.write(str_stats, table=True)
         
@@ -337,14 +336,14 @@ class TrainMetricsRecorder(LearnerCallback):
             )
             self._axes = (self._axes.flatten() if len(self.train_metrics[0]) > 1 else [self._axes])
             plt.close(self._fig)
-        
+
         # Plot each metrics as a subplot
         for i, ax in enumerate(self._axes):
             ax.clear()
 
             # Plot training set results
             tr_m = [met[i] for met in self.train_metrics]
-            x_axis = [i for i in range(len(tr_m))]
+            x_axis = list(range(len(tr_m)))
             ax.plot(x_axis, tr_m, label="Train")
 
             # Plot validation set results

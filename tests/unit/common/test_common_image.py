@@ -17,7 +17,7 @@ def test_im_width(tiny_ic_data_path):
     im_path = Path(tiny_ic_data_path) / "can" / "1.jpg"
     assert (
         im_width(im_path) == 499
-    ), "Expected image width of 499, but got {}".format(im_width(im_path))
+    ), f"Expected image width of 499, but got {im_width(im_path)}"
     im = np.zeros((100, 50))
     assert im_width(im) == 50, "Expected image width of 50, but got ".format(
         im_width(im)

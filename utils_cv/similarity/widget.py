@@ -81,9 +81,7 @@ class DistanceWidget(object):
             """Next / previous image button callback."""
             step = int(obj.value)
             self.vis_image_index += step
-            self.vis_image_index = min(
-                max(0, self.vis_image_index), int(len(self.dataset)) - 1
-            )
+            self.vis_image_index = min(max(0, self.vis_image_index), len(self.dataset) - 1)
             self.w_image_slider.value = self.vis_image_index
             self.update()
 

@@ -58,7 +58,7 @@ class AnnotationWidget(object):
                 )
             ]
         assert (
-            len(self.im_filenames) > 0
+            self.im_filenames
         ), f"Not a single image specified or found in directory {im_dir}."
 
         # Initialize empty annotations and load previous annotations if file exist
@@ -128,10 +128,7 @@ class AnnotationWidget(object):
             im_filename = self.im_filenames[self.vis_image_index]
             labels = self.annos[im_filename].labels
             exclude = self.annos[im_filename].exclude
-            if exclude or len(labels) > 0:
-                return True
-
-            return False
+            return bool(exclude or len(labels) > 0)
 
         def button_pressed(obj):
             """Next / previous image button callback."""
@@ -165,37 +162,38 @@ class AnnotationWidget(object):
             # rather than a change of state when e.g. the checkbox value was updated programatically. This is a bit
             # of hack, but necessary since widgets.Checkbox() does not support a on_click() callback or similar.
             if (
-                "new" in obj
-                and isinstance(obj["new"], dict)
-                and len(obj["new"]) == 0
+                "new" not in obj
+                or not isinstance(obj["new"], dict)
+                or len(obj["new"]) != 0
             ):
-                # If single-label annotation then unset all checkboxes except the one which the user just clicked
-                if not self.w_multi_class.value:
-                    for w in self.label_widgets:
-                        if w.description != obj["owner"].description:
-                            w.value = False
+                return
+            # If single-label annotation then unset all checkboxes except the one which the user just clicked
+            if not self.w_multi_class.value:
+                for w in self.label_widgets:
+                    if w.description != obj["owner"].description:
+                        w.value = False
 
-                # Update annotation object
-                im_filename = self.im_filenames[self.vis_image_index]
-                self.annos[im_filename].labels = [
-                    w.description for w in self.label_widgets if w.value
-                ]
-                self.annos[im_filename].exclude = self.exclude_widget.value
+            # Update annotation object
+            im_filename = self.im_filenames[self.vis_image_index]
+            self.annos[im_filename].labels = [
+                w.description for w in self.label_widgets if w.value
+            ]
+            self.annos[im_filename].exclude = self.exclude_widget.value
 
-                # Write to disk as tab-separated file.
-                with open(self.anno_path, "w") as f:
-                    f.write(
-                        "{}\t{}\t{}\n".format(
-                            "IM_FILENAME", "EXCLUDE", "LABELS"
-                        )
+            # Write to disk as tab-separated file.
+            with open(self.anno_path, "w") as f:
+                f.write(
+                    "{}\t{}\t{}\n".format(
+                        "IM_FILENAME", "EXCLUDE", "LABELS"
                     )
-                    for k, v in self.annos.items():
-                        if v.labels != [] or v.exclude:
-                            f.write(
-                                "{}\t{}\t{}\n".format(
-                                    k, v.exclude, ",".join(v.labels)
-                                )
+                )
+                for k, v in self.annos.items():
+                    if v.labels != [] or v.exclude:
+                        f.write(
+                            "{}\t{}\t{}\n".format(
+                                k, v.exclude, ",".join(v.labels)
                             )
+                        )
 
         # ------------
         # UI - image + controls (left side)
@@ -326,10 +324,10 @@ class ResultsWidget(object):
         im = self.dataset.x[self.vis_image_index]  # fastai Image object
 
         _, sort_order = self._list_sort(scores, reverse=True)
-        pred_labels_str = ""
-        for i in sort_order:
-            pred_labels_str += f"{self.labels[i]} ({scores[i]:3.2f})\n"
-        self.w_pred_labels.value = str(pred_labels_str)
+        pred_labels_str = "".join(
+            f"{self.labels[i]} ({scores[i]:3.2f})\n" for i in sort_order
+        )
+        self.w_pred_labels.value = pred_labels_str
 
         self.w_image_header.value = f"Image index: {self.vis_image_index}"
 
@@ -366,28 +364,27 @@ class ResultsWidget(object):
             """Return if image should be shown."""
             actual_label = str(self.dataset.y[image_index])
             bo_pred_correct = actual_label == self.pred_labels[image_index]
-            if (bo_pred_correct and self.w_filter_correct.value) or (
-                not bo_pred_correct and self.w_filter_wrong.value
-            ):
-                return True
-            return False
+            return bool(
+                (bo_pred_correct and self.w_filter_correct.value)
+                or (not bo_pred_correct and self.w_filter_wrong.value)
+            )
 
         def button_pressed(obj):
             """Next / previous image button callback."""
             step = int(obj.value)
             self.vis_image_index += step
             self.vis_image_index = min(
-                max(0, self.vis_image_index), int(len(self.pred_labels)) - 1
+                max(0, self.vis_image_index), len(self.pred_labels) - 1
             )
             while not image_passes_filters(self.vis_image_index):
                 self.vis_image_index += step
                 if (
                     self.vis_image_index <= 0
-                    or self.vis_image_index >= int(len(self.pred_labels)) - 1
+                    or self.vis_image_index >= len(self.pred_labels) - 1
                 ):
                     break
             self.vis_image_index = min(
-                max(0, self.vis_image_index), int(len(self.pred_labels)) - 1
+                max(0, self.vis_image_index), len(self.pred_labels) - 1
             )
             self.w_image_slider.value = self.vis_image_index
             self.update()

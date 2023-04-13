@@ -59,9 +59,9 @@ output_msg = """Output has been saved to '{output_path}'.""".format
 
 def _str_to_bool(string: str) -> bool:
     """ Convert string to bool. """
-    if string.lower() in ("yes", "true", "t", "y", "1"):
+    if string.lower() in {"yes", "true", "t", "y", "1"}:
         return True
-    elif string.lower() in ("no", "false", "f", "n", "0"):
+    elif string.lower() in {"no", "false", "f", "n", "0"}:
         return False
     else:
         raise argparse.ArgumentTypeError("Boolean value expected.")

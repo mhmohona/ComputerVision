@@ -44,9 +44,7 @@ def test_zero_one_accuracy(multilabel_result):
     assert zero_one_accuracy(y_pred, y_true, sigmoid=True) == tensor(
         1.0 - 0.75
     )
-    assert zero_one_accuracy(y_pred, y_true, threshold=1.0) == tensor(
-        1.0 - 1.0
-    )
+    assert zero_one_accuracy(y_pred, y_true, threshold=1.0) == tensor(0.0)
 
 
 def test_get_optimal_threshold(multilabel_result):

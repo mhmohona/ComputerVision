@@ -140,12 +140,12 @@ def tracker(args):
         token = os.environ.get("GITHUB_TOKEN", GITHUB_TOKEN)
         g = Github(token, args.github_repo)
         git_doc = github_stats_as_dict(g)
-        log.info("GitHub stats -- {}".format(git_doc))
+        log.info(f"GitHub stats -- {git_doc}")
         g.clean()
 
     if args.event:
         event_doc = event_as_dict(args.event, args.event_date)
-        log.info("Event -- {}".format(event_doc))
+        log.info(f"Event -- {event_doc}")
 
     if args.save_to_database:
         # if there is an env variable, overwrite it
@@ -162,11 +162,11 @@ if __name__ == "__main__":
     log.info("Starting routine")
     args = parse_args()
     try:
-        log.info("Arguments: {}".format(args))
+        log.info(f"Arguments: {args}")
         tracker(args)
     except Exception as e:
         trace = traceback.format_exc()
-        log.error("Traceback: {}".format(trace))
-        log.error("Exception: {}".format(e))
+        log.error(f"Traceback: {trace}")
+        log.error(f"Exception: {e}")
     finally:
         log.info("Routine finished")

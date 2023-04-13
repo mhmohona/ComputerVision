@@ -87,10 +87,8 @@ def unzip_url(
         _raise_file_exists_error(zip_file)
     else:
         r = requests.get(url)
-        f = open(zip_file, "wb")
-        f.write(r.content)
-        f.close()
-
+        with open(zip_file, "wb") as f:
+            f.write(r.content)
     # unzip downloaded zipfile if dir not exists
     if unzipped_dir.is_dir():
         _raise_file_exists_error(unzipped_dir)
@@ -111,12 +109,7 @@ def unzip_urls(
     if not Path(dest).is_dir():
         os.makedirs(dest)
 
-    # download all data urls
-    paths = list()
-    for url in urls:
-        paths.append(unzip_url(url, dest, exist_ok=True))
-
-    return paths
+    return [unzip_url(url, dest, exist_ok=True) for url in urls]
 
 
 def root_path() -> Path:

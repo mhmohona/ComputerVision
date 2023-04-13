@@ -39,11 +39,7 @@ def ims2strlist(im_path_list: list) -> list:
             decoded into strings
     """
 
-    im_string_list = []
-    for im_path in im_path_list:
-        im_string_list.append(im2base64(im_path).decode("utf-8"))
-
-    return im_string_list
+    return [im2base64(im_path).decode("utf-8") for im_path in im_path_list]
 
 
 def im_width(input: Union[str, np.array]) -> int:
@@ -73,7 +69,7 @@ def im_width_height(input: Union[str, np.array]) -> Tuple[int, int]:
     Return:
         Tuple of ints (width,height).
     """
-    if isinstance(input, str) or isinstance(input, Path):
+    if isinstance(input, (str, Path)):
         width, height = Image.open(
             input
         ).size  # this is fast since it does not load the full image

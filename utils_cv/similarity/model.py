@@ -82,11 +82,11 @@ def compute_features(
     Returns: DNN feature of the provided image.
 
     """
-    feat_dict = {}
     im_paths = [str(x) for x in list(data.items)]
-    for im_path in im_paths:
-        feat_dict[im_path] = compute_feature(im_path, learn, embedding_layer)
-    return feat_dict
+    return {
+        im_path: compute_feature(im_path, learn, embedding_layer)
+        for im_path in im_paths
+    }
 
 
 def compute_features_learner(
@@ -112,7 +112,7 @@ def compute_features_learner(
     # and len(feats) is as expected 101. A way around this is to use DatasetType.Fix instead when referring to the training set.
     # See e.g. issue: https://forums.fast.ai/t/get-preds-returning-less-results-than-length-of-original-dataset/34148
 
-    if dataset_type == DatasetType.Train or dataset_type == DatasetType.Fix:
+    if dataset_type in [DatasetType.Train, DatasetType.Fix]:
         dataset_type = (
             DatasetType.Fix
         )  # Training set without shuffeling and no dropping of last batch. See note above.

@@ -30,7 +30,7 @@ class Github:
         self.git_url = git_url
         self.repo_name = self.git_url.split(BASE_URL)[1]
         self.api_url = END_POINT + self.repo_name
-        self.headers = {"Authorization": "token " + self.token}
+        self.headers = {"Authorization": f"token {self.token}"}
 
     @property
     @lru_cache()
@@ -40,10 +40,7 @@ class Github:
             json: JSON with general stats.
         """
         r = requests.get(self.api_url, headers=self.headers)
-        if r.ok:
-            return r.json()
-        else:
-            return None
+        return r.json() if r.ok else None
 
     @property
     def forks(self):
@@ -71,10 +68,7 @@ class Github:
             + "+type%3Aissues"
         )
         r = requests.get(url, headers=self.headers)
-        if r.ok:
-            return r.json()["total_count"]
-        else:
-            return None
+        return r.json()["total_count"] if r.ok else None
 
     @property
     @lru_cache()
@@ -90,10 +84,7 @@ class Github:
             + "+type%3Apr"
         )
         r = requests.get(url, headers=self.headers)
-        if r.ok:
-            return r.json()["total_count"]
-        else:
-            return None
+        return r.json()["total_count"] if r.ok else None
 
     @property
     def stars(self):
@@ -127,7 +118,7 @@ class Github:
             dict: Dictionary of 52 elements (1 per week) with the commits every day 
                 (starting on Sunday), total commit sum and first day of the week.
         """
-        r = requests.get(self.api_url + "/stats/commit_activity", headers=self.headers)
+        r = requests.get(f"{self.api_url}/stats/commit_activity", headers=self.headers)
         if r.ok:
             resp = r.json()
         else:
@@ -149,12 +140,9 @@ class Github:
                 and unique number of references.
         """
         r = requests.get(
-            self.api_url + "/traffic/popular/referrers", headers=self.headers
+            f"{self.api_url}/traffic/popular/referrers", headers=self.headers
         )
-        if r.ok:
-            return r.json()
-        else:
-            return None
+        return r.json() if r.ok else None
 
     @property
     def number_total_referrers(self):
@@ -188,11 +176,8 @@ class Github:
         Returns:
             json: JSON with the content link, total and unique views.
         """
-        r = requests.get(self.api_url + "/traffic/popular/paths", headers=self.headers)
-        if r.ok:
-            return r.json()
-        else:
-            return None
+        r = requests.get(f"{self.api_url}/traffic/popular/paths", headers=self.headers)
+        return r.json() if r.ok else None
 
     @property
     @lru_cache()
@@ -204,11 +189,8 @@ class Github:
         Returns:
             json: JSON with daily views.
         """
-        r = requests.get(self.api_url + "/traffic/views", headers=self.headers)
-        if r.ok:
-            return r.json()
-        else:
-            return None
+        r = requests.get(f"{self.api_url}/traffic/views", headers=self.headers)
+        return r.json() if r.ok else None
 
     @property
     def number_total_views(self):
@@ -236,11 +218,8 @@ class Github:
         Returns:
             json: JSON with daily clones. 
         """
-        r = requests.get(self.api_url + "/traffic/clones", headers=self.headers)
-        if r.ok:
-            return r.json()
-        else:
-            return None
+        r = requests.get(f"{self.api_url}/traffic/clones", headers=self.headers)
+        return r.json() if r.ok else None
 
     @property
     def number_total_clones(self):
@@ -284,11 +263,8 @@ class Github:
         Returns:
             dict: Dictionary of languages and lines of code.
         """
-        r = requests.get(self.api_url + "/languages", headers=self.headers)
-        if r.ok:
-            return r.json()
-        else:
-            return None
+        r = requests.get(f"{self.api_url}/languages", headers=self.headers)
+        return r.json() if r.ok else None
 
     @property
     def number_languages(self):
@@ -419,7 +395,4 @@ class Github:
                 + self.git_url.split(BASE_URL)[1]
             )
             git.Repo.clone_from(private_url, repo_dir)
-        if os.path.isdir(repo_dir):
-            return repo_dir
-        else:
-            return None
+        return repo_dir if os.path.isdir(repo_dir) else None

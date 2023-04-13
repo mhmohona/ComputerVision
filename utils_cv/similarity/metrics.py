@@ -34,28 +34,28 @@ def vector_distance(
     # Distance computation
     vecDiff = vec1 - vec2
     method = method.lower()
-    if method == "l1":
+    if method == "chisquared":
+        dist = scipy.chiSquared(vec1, vec2)
+    elif method == "correlation":
+        dist = scipy.spatial.distance.correlation(vec1, vec2)
+    elif method == "cosine":
+        dist = scipy.spatial.distance.cosine(vec1, vec2)
+    elif method == "hamming":
+        dist = scipy.spatial.distance.hamming(vec1 > 0, vec2 > 0)
+    elif method == "l1":
         dist = sum(abs(vecDiff))
     elif method == "l2":
         dist = np.linalg.norm(vecDiff, 2)
-    elif method == "normalizedl2":
-        a = vec1 / np.linalg.norm(vec1, 2)
-        b = vec2 / np.linalg.norm(vec2, 2)
-        dist = np.linalg.norm(a - b, 2)
-    elif method == "cosine":
-        dist = scipy.spatial.distance.cosine(vec1, vec2)
-    elif method == "correlation":
-        dist = scipy.spatial.distance.correlation(vec1, vec2)
-    elif method == "chisquared":
-        dist = scipy.chiSquared(vec1, vec2)
     elif method == "normalizedchisquared":
         a = vec1 / sum(vec1)
         b = vec2 / sum(vec2)
         dist = scipy.chiSquared(a, b)
-    elif method == "hamming":
-        dist = scipy.spatial.distance.hamming(vec1 > 0, vec2 > 0)
+    elif method == "normalizedl2":
+        a = vec1 / np.linalg.norm(vec1, 2)
+        b = vec2 / np.linalg.norm(vec2, 2)
+        dist = np.linalg.norm(a - b, 2)
     else:
-        raise Exception("Distance method unknown: " + method)
+        raise Exception(f"Distance method unknown: {method}")
     return dist
 
 
@@ -103,5 +103,4 @@ def recall_at_k(ranks: List[int], k: int) -> float:
 
     """
     below_threshold = [x for x in ranks if x <= k]
-    percent_in_top_k = round(100.0 * len(below_threshold) / len(ranks), 1)
-    return percent_in_top_k
+    return round(100.0 * len(below_threshold) / len(ranks), 1)

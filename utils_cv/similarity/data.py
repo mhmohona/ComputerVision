@@ -81,7 +81,7 @@ def comparative_set_builder(
     all_paths = [str(s) for s in list(data.x.items)]
     all_labels = [str(category.obj) for category in data.y]
 
-    for num_set in range(num_sets):
+    for _ in range(num_sets):
         # Retrieve random query image
         query_index = np.random.randint(len(data))
         query_im_path = all_paths[query_index]
